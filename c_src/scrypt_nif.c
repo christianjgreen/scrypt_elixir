@@ -1,5 +1,6 @@
 #include <erl_nif.h>
 #include <string.h>
+
 #include "crypto_scrypt.h"
 #include "crypto_verify_bytes.h"
 #include "insecure_memzero.h"
@@ -25,7 +26,7 @@ hash_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 		!enif_get_uint(env, argv[5], &dk_len))
 		return enif_make_badarg(env);
 
-	enif_alloc_binary(KEY_LEN, &bin_out);
+	enif_alloc_binary(dk_len, &bin_out);
 
 	N = 1 << logN;
 	exitcode = crypto_scrypt(password.data, password.size, salt.data, salt.size,
@@ -37,7 +38,7 @@ hash_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 	}
 	else
 	{
-
+		enif_release_binary(&bin_out);
 		return enif_make_int(env, exitcode);
 	}
 }
@@ -94,6 +95,7 @@ kdf_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 	}
 	else
 	{
+		enif_release_binary(&bin_out);
 		return enif_make_int(env, exitcode);
 	}
 }
@@ -130,22 +132,21 @@ verify_kdf_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 
 	if (exitcode == 0)
 	{
-
 		HMAC_SHA256_Init(&hmac_ctx, key_hmac, 32);
 		HMAC_SHA256_Update(&hmac_ctx, hash.data, 64);
 		HMAC_SHA256_Final(hmac_buf, &hmac_ctx);
 		if (crypto_verify_bytes(hmac_buf, &hash.data[64], 32))
 		{
 			insecure_memzero(dk, KEY_LEN);
-			return enif_make_atom(env, "error");
+			return enif_make_atom(env, "false");
 		}
 		insecure_memzero(dk, KEY_LEN);
-		return enif_make_atom(env, "ok");
+		return enif_make_atom(env, "true");
 	}
 	else
 	{
 		insecure_memzero(dk, KEY_LEN);
-		return enif_make_atom(env, "error");
+		return enif_make_int(env, exitcode);
 	}
 }
 
@@ -178,16 +179,19 @@ verify_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 	{
 		if (crypto_verify_bytes(hash.data, dk, hash.size))
 		{
-			insecure_memzero(dk, KEY_LEN);
+			insecure_memzero(dk, hash.size);
+			free(dk);
 			return enif_make_atom(env, "false");
 		}
 		insecure_memzero(dk, hash.size);
+		free(dk);
 		return enif_make_atom(env, "true");
 	}
 	else
 	{
 		insecure_memzero(dk, hash.size);
-		return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_int(env, exitcode));
+		free(dk);
+		return enif_make_int(env, exitcode);
 	}
 }
 
@@ -197,4 +201,4 @@ static ErlNifFunc nif_funcs[] = {
 	{"verify_kdf_nif", 2, verify_kdf_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
 	{"verify_nif", 6, verify_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 
-ERL_NIF_INIT(Elixir.ScryptElixir, nif_funcs, NULL, NULL, NULL, NULL);
+ERL_NIF_INIT(Elixir.Scrypt.NIF, nif_funcs, NULL, NULL, NULL, NULL);
