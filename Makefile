@@ -18,7 +18,7 @@ SRC = scrypt/lib/crypto/crypto_scrypt.c \
 
 
 ERTS_INCLUDE_PATH = $(shell erl -noshell -s init stop -eval "io:setopts(standard_io, [{encoding, unicode}]), io:format(\"~ts/erts-~ts/include/\", [code:root_dir(), erlang:system_info(version)]).")
-CFLAGS += -pthread -O3 -std=c99 -Wall -g -I$(INC_SCRYPT) \
+CFLAGS += -pthread -O3 -std=c99 -pedantic -Wall -g -I$(INC_SCRYPT) \
 			-I$(INC_LIB) \
 			-I$(INC_SRC) \
 			-I$(INC_CPU) \
@@ -27,6 +27,8 @@ CFLAGS += -pthread -O3 -std=c99 -Wall -g -I$(INC_SCRYPT) \
 			-I$(INC_UTIL) \
 			-I$(INC_CRYPTO) \
 			-DHAVE_CONFIG_H \
+			-D_POSIX_C_SOURCE=200809L \
+			-D_XOPEN_SOURCE=700 \
 			-I"$(ERTS_INCLUDE_PATH)" 
 
 KERNEL_NAME := $(shell uname -s)

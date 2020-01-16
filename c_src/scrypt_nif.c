@@ -201,4 +201,4 @@ static ErlNifFunc nif_funcs[] = {
 	{"verify_kdf_nif", 2, verify_kdf_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND},
 	{"verify_nif", 6, verify_nif, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 
-ERL_NIF_INIT(Elixir.Scrypt.NIF, nif_funcs, NULL, NULL, NULL, NULL);
+ERL_NIF_INIT(Elixir.Scrypt.NIF, nif_funcs, NULL, NULL, NULL, NULL)
