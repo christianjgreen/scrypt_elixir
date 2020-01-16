@@ -1,6 +1,7 @@
 # ScryptElixir
 
-**TODO: Add description**
+Elixir wrapper for the Scrypt key derivation function. 
+https://www.tarsnap.com/scrypt.html
 
 ## Installation
 
