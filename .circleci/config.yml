@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
 
-      - run: git submodule init
+      - run: git submodule init && git submodule update
       - run: mix local.hex --force
       - run: mix deps.get
       - run: mix ecto.create
