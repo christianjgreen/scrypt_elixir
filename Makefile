@@ -1,4 +1,4 @@
-INC_SCRYPT = scrypt
+INC_CFG = c_src
 INC_LIB = scrypt/lib 
 INC_SRC = scrypt/src
 INC_CPU = scrypt/libcperciva/cpusupport
@@ -18,7 +18,7 @@ SRC = scrypt/lib/crypto/crypto_scrypt.c \
 
 
 ERTS_INCLUDE_PATH = $(shell erl -noshell -s init stop -eval "io:setopts(standard_io, [{encoding, unicode}]), io:format(\"~ts/erts-~ts/include/\", [code:root_dir(), erlang:system_info(version)]).")
-CFLAGS += -pthread -O3 -std=c99 -pedantic -Wall -g -I$(INC_SCRYPT) \
+CFLAGS += -pthread -O3 -std=c99 -pedantic -Wall -g -I$(INC_CFG) \
 			-I$(INC_LIB) \
 			-I$(INC_SRC) \
 			-I$(INC_CPU) \
