@@ -1,9 +1,7 @@
 INC_CFG = c_src
 INC_LIB = scrypt/lib 
-INC_SRC = scrypt/src
 INC_CPU = scrypt/libcperciva/cpusupport
 INC_ALG = scrypt/libcperciva/alg
-INC_LIBPCRYPTO = scrypt/libcperciva/crypto
 INC_UTIL = scrypt/libcperciva/util
 INC_CRYPTO = scrypt/lib/crypto
 
@@ -11,19 +9,16 @@ INC_CRYPTO = scrypt/lib/crypto
 SRC = scrypt/lib/crypto/crypto_scrypt.c \
       scrypt/lib/crypto/crypto_scrypt_smix.c \
 	  scrypt/libcperciva/alg/sha256.c	\
-	  scrypt/libcperciva/crypto/crypto_verify_bytes.c \
 	  scrypt/libcperciva/util/insecure_memzero.c \
 	  scrypt/libcperciva/util/warnp.c \
       c_src/scrypt_nif.c 
 
 
 ERTS_INCLUDE_PATH = $(shell erl -noshell -s init stop -eval "io:setopts(standard_io, [{encoding, unicode}]), io:format(\"~ts/erts-~ts/include/\", [code:root_dir(), erlang:system_info(version)]).")
-CFLAGS += -pthread -O3 -std=c99 -pedantic -Wall -g -I$(INC_CFG) \
+CFLAGS += -pthread -O3 -std=c99 -pedantic -Wall -g -O0 -I$(INC_CFG) \
 			-I$(INC_LIB) \
-			-I$(INC_SRC) \
 			-I$(INC_CPU) \
 			-I$(INC_ALG) \
-			-I$(INC_LIBPCRYPTO) \
 			-I$(INC_UTIL) \
 			-I$(INC_CRYPTO) \
 			-DHAVE_CONFIG_H \
