@@ -4,8 +4,6 @@
 
 #include "crypto_scrypt.h"
 
-#define KEY_LEN 64
-
 ERL_NIF_TERM
 hash_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
