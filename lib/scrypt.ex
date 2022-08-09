@@ -7,7 +7,7 @@ defmodule Scrypt do
   alias Scrypt.NIF
 
   @doc """
-  Creates an Scrypt hash from the given parameters, allowing a custom salt 
+  Creates an Scrypt hash from the given parameters, allowing a custom salt
   and key length.
 
 
@@ -60,7 +60,7 @@ defmodule Scrypt do
       <<115, 99, 114, 121, 112, 116, 0, 14, 0, 0, 0, 8, 0, 0, 0, 1, 166, 59, 141, 39,
         16, 29, 92, 191, 50, 7, 102, 174, 27, 240, 229, 27, 121, 234, 97, 111, 98,
         182, 29, 158, 117, 43, 9, 141, 172, 189, 106, 88, 213, 152, ...>>
-      
+
       iex> Scrypt.kdf("hunter2", :crypto.strong_rand_bytes(32), 14, 8, 1)
       <<115, 99, 114, 121, 112, 116, 0, 14, 0, 0, 0, 8, 0, 0, 0, 1, 120, 127, 46, 232,
         104, 21, 51, 3, 154, 50, 72, 127, 172, 43, 131, 37, 182, 149, 168, 88, 27,
@@ -105,7 +105,7 @@ defmodule Scrypt do
       <<115, 99, 114, 121, 112, 116, 0, 14, 0, 0, 0, 8, 0, 0, 0, 1, 66, 223, 14, 146,
         240, 251, 4, 70, 177, 59, 232, 159, 183, 134, 188, 127, 72, 170, 70, 224, 134,
         201, 74, 15, 188, 227, 34, 222, 250, 192, 153, 226, 42, 189, ...>>
-      iex(2)> Scrypt.verify_kdf?(header, "hunter2")   
+      iex(2)> Scrypt.verify_kdf?(header, "hunter2")
       true
   """
   @spec verify_kdf?(header :: <<_::768>>, String.t()) :: boolean()
@@ -142,7 +142,7 @@ defmodule Scrypt do
     first_chunk = <<"scrypt", 0, log_n, enc_r::binary, enc_p::binary, salt::binary>>
     <<first_sha::binary-size(16), _::binary>> = :crypto.hash(:sha256, first_chunk)
     second_chunk = <<first_chunk::binary, first_sha::binary>>
-    hmac = :crypto.hmac(:sha256, hmac_key, second_chunk)
+    hmac = :crypto.mac(:hmac, :sha256, hmac_key, second_chunk)
     <<second_chunk::binary, hmac::binary>>
   end
 
@@ -170,7 +170,7 @@ defmodule Scrypt do
   end
 
   defp secure_compare(<<x, left::binary>>, <<y, right::binary>>, acc) do
-    secure_compare(left, right, acc ||| x ^^^ y)
+    secure_compare(left, right, acc ||| Bitwise.bxor(x, y))
   end
 
   defp secure_compare(<<>>, <<>>, acc) do
